@@ -11,7 +11,7 @@ class Mario:
     def __init__(self, state_dim, action_dim, save_dir, checkpoint=None):
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.memory = deque(maxlen=100000)
+        self.memory = deque(maxlen=5000)
         self.batch_size = 32
 
         self.exploration_rate = 1
@@ -105,7 +105,7 @@ class Mario:
     @flow.no_grad()
     def td_target(self, reward, next_state, done):
         next_state_Q = self.net(next_state, model='online')
-        best_action = flow.argmax(next_state_Q, axis=1)
+        best_action = flow.argmax(next_state_Q, dim=1)
         next_Q = self.net(next_state, model='target')[np.arange(0, self.batch_size), best_action]
         return (reward + (1 - done.float()) * self.gamma * next_Q).float()
 
